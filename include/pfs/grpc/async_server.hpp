@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2019 Vladislav Trifochkin
+// Copyright (c) 2019-2022 Vladislav Trifochkin
 //
-// This file is part of [pfs-grpc](https://github.com/semenovf/pfs-grpc) library.
+// This file is part of `grpc-helper-lib`.
 //
 // Changelog:
 //      2019.10.21 Initial version

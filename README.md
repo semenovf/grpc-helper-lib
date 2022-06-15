@@ -1,4 +1,4 @@
-# pfs-grpc
+# grpc-helper-lib
 
 C++ wrapper for gRPC
 
@@ -11,19 +11,16 @@ $ git submodule add https://github.com/grpc/grpc.git grpc
 
 ## Build
 ```sh
-$ git clone git@github.com:semenovf/pfs-grpc.git
-$ cd pfs-grpc
+$ git clone https://github.com/semenovf/grpc-helper-lib.git grpc-helper
+$ cd grpc-helper
 $ git submodule update --init --recursive
-$ cd ..
-$ mkdir -p builds/pfs-grpc
-$ cd builds/pfs-grpc
-$ cmake -DCMAKE_BUILD_TYPE=Debug ../../pfs-grpc
-$ cmake --build .
+$ cd scripts
+$ ./build.SUFFIX.sh
 ```
 
 ### Build for Windows
 ```sh
-cmake -G "Visual Studio 14 2015" -DCMAKE_CXX_STANDARD=11 -Wno-dev -A x64 <pfs-grpc source path>
+cmake -G "Visual Studio 14 2015" -DCMAKE_CXX_STANDARD=11 -Wno-dev -A x64 SOURCE_PATH
 cmake --build .
 ```
 

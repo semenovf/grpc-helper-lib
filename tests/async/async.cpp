@@ -6,14 +6,14 @@
 // Changelog:
 //      2019.10.20 Initial version
 ////////////////////////////////////////////////////////////////////////////////
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "../doctest.h"
 #include "pfs/grpc/async_client.hpp"
 #include "pfs/grpc/async_server.hpp"
-#include "async.pb.h"
-#include "async.grpc.pb.h"
+#include "async/async.pb.h"
+#include "async/async.grpc.pb.h"
 #include <map>
 #include <thread>
-
-#include "../catch.hpp"
 
 static std::string const SERVER_ADDR = "localhost:1521";
 
@@ -266,9 +266,9 @@ public:
         // string 'PrepareAsync' and rpc name from .proto file ('CallStart').
         // This rule is valid for 'Simple RPC'
 #if _WIN32
-		return this->call<TestRpc::StartServiceRequest, TestRpc::ServiceStatus>(TestRpc::StartServiceRequest{}
-			, &TestRpc::TestService::Stub::PrepareAsyncStart
-			, pfs::grpc::async_unary<TestRpc::ServiceStatus>::response_handler(f));
+        return this->call<TestRpc::StartServiceRequest, TestRpc::ServiceStatus>(TestRpc::StartServiceRequest{}
+            , &TestRpc::TestService::Stub::PrepareAsyncStart
+            , pfs::grpc::async_unary<TestRpc::ServiceStatus>::response_handler(f));
 #else
         return this->call(TestRpc::StartServiceRequest{}
                 , & TestRpc::TestService::Stub::PrepareAsyncStart
@@ -288,9 +288,9 @@ public:
 
         // Same as for 'call_start'
 #if _WIN32
-		return this->call<TestRpc::StopService, TestRpc::ServiceStatus>(TestRpc::StopService{}
-			, &TestRpc::TestService::Stub::PrepareAsyncStop
-			, pfs::grpc::async_unary<TestRpc::ServiceStatus>::response_handler(f));
+        return this->call<TestRpc::StopService, TestRpc::ServiceStatus>(TestRpc::StopService{}
+            , &TestRpc::TestService::Stub::PrepareAsyncStop
+            , pfs::grpc::async_unary<TestRpc::ServiceStatus>::response_handler(f));
 #else
         return this->call(TestRpc::StopService{}
                 , & TestRpc::TestService::Stub::PrepareAsyncStop
@@ -314,9 +314,9 @@ public:
         };
 
 #if _WIN32
-		return this->call<TestRpc::GetListModules, response_type>(TestRpc::GetListModules{}
-			, &TestRpc::TestService::Stub::PrepareAsyncListModules
-			, pfs::grpc::async_server_streaming<response_type>::response_handler(f));
+        return this->call<TestRpc::GetListModules, response_type>(TestRpc::GetListModules{}
+            , &TestRpc::TestService::Stub::PrepareAsyncListModules
+            , pfs::grpc::async_server_streaming<response_type>::response_handler(f));
 #else
         return this->call(TestRpc::GetListModules{}
                 , & TestRpc::TestService::Stub::PrepareAsyncListModules
@@ -350,9 +350,9 @@ public:
         };
 
 #if _WIN32
-		return this->call<request_type, response_type>(std::move(requests)
-			, &TestRpc::TestService::Stub::PrepareAsyncSendSegments
-			, pfs::grpc::async_client_streaming<request_type, response_type>::response_handler(f));
+        return this->call<request_type, response_type>(std::move(requests)
+            , &TestRpc::TestService::Stub::PrepareAsyncSendSegments
+            , pfs::grpc::async_client_streaming<request_type, response_type>::response_handler(f));
 #else
         return this->call(std::move(requests)
                 , & TestRpc::TestService::Stub::PrepareAsyncSendSegments

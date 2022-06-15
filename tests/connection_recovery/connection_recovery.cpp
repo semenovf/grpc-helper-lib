@@ -8,8 +8,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "pfs/grpc/async_client.hpp"
 #include "pfs/grpc/async_server.hpp"
-#include "connection_recovery.pb.h"
-#include "connection_recovery.grpc.pb.h"
+#include "connection_recovery/connection_recovery.pb.h"
+#include "connection_recovery/connection_recovery.grpc.pb.h"
 #include <mutex>
 #include <condition_variable>
 #include <thread>
@@ -184,7 +184,7 @@ bool server_is_alive ()
 
 #if _WIN32
 	// Close the socket to release the resources associated
-	// Normally an application calls shutdown() before closesocket 
+	// Normally an application calls shutdown() before closesocket
 	//   to  disables sends or receives on a socket first
 	shutdown(fd, SD_BOTH);
 	rc = closesocket(fd);
