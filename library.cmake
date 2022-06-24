@@ -14,8 +14,6 @@
 ################################################################################
 ################################################################################
 #
-# This file must be included once to build gRPC library with dependences and set
-# global variables (see 'OUTPUT VARIABLE' prefixed comments).
 # This sctipt choose appropriate version of gRPC: preloaded (with modifications
 # to use with GCCC 4.7.2) or loaded as submodule
 #
@@ -24,6 +22,12 @@ cmake_minimum_required (VERSION 3.11)
 project(grpc-helper-lib C CXX)
 
 option(GRPC_HELPER__FORCE_PRELOADED_GRPC "Force process preloaded version of gRPC" OFF)
+
+# `grpc-helper` source directory
+set(GRPC_HELPER__ROOT "${CMAKE_CURRENT_LIST_DIR}")
+
+portable_target(LIBRARY ${PROJECT_NAME} INTERFACE ALIAS pfs::grpc_helper)
+portable_target(INCLUDE_DIRS ${PROJECT_NAME} INTERFACE ${GRPC_HELPER__ROOT}/include)
 
 # Workaround for GCC 4.7.2
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
@@ -35,44 +39,33 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_
     include(${CMAKE_CURRENT_LIST_DIR}/cmake/cxx11_gcc_47_compiler_error_1035.cmake)
 endif()
 
-# OUTPUT VARIABLE: `grpc-helper` source directory
-set(GRPC_HELPER__ROOT "${CMAKE_CURRENT_LIST_DIR}")
-
 # Submodules downloaded (allow use of last version of gRPC library and
 # it's dependences)
 if (NOT GRPC_HELPER__FORCE_PRELOADED_GRPC AND EXISTS "${GRPC_HELPER__ROOT}/3rdparty/grpc/CMakeLists.txt")
     # OUTPUT VARIABLE: root gRPC source directory
     set(GRPC_HELPER__GRPC_SOURCE_DIR "${GRPC_HELPER__ROOT}/3rdparty/grpc")
-
     set(GRPC_HELPER__GRPC_BINARY_SUBDIR "3rdparty/grpc")
 else()
     # OUTPUT VARIABLE: root gRPC source directory
     set(GRPC_HELPER__GRPC_SOURCE_DIR "${GRPC_HELPER__ROOT}/3rdparty/preloaded/grpc")
-
     set(GRPC_HELPER__GRPC_BINARY_SUBDIR "3rdparty/preloaded/grpc")
 endif()
 
-# OUTPUT VARIABLE: Path to gRPC codegen cmake file
-set(GRPC_HELPER__GRPC_CODEGEN "${GRPC_HELPER__ROOT}/cmake/Generate_gRPC.cmake")
-
-# OUTPUT VARIABLE: Path to Protobuf codegen cmake file
-set(GRPC_HELPER__PROTOBUF_CODEGEN "${GRPC_HELPER__ROOT}/cmake/Generate_proto.cmake")
-
-if (ANDROID)
-   if (NOT CUSTOM_PROTOC)
-      set(GRPC_HELPER__PROTOC_BIN "${CMAKE_BINARY_DIR}/protoc${CMAKE_EXECUTABLE_SUFFIX}")
-    else()
-       set(GRPC_HELPER__PROTOC_BIN "${CUSTOM_PROTOC}")
-    endif()
-
-    if (NOT CUSTOM_GRPC_CPP_PLUGIN)
-        set(GRPC_HELPER__CPP_PLUGIN "${CMAKE_BINARY_DIR}/grpc_cpp_plugin${CMAKE_EXECUTABLE_SUFFIX}")
-    else()
-        set(GRPC_HELPER__CPP_PLUGIN "${CUSTOM_GRPC_CPP_PLUGIN}")
-    endif()
-
-    set(_gRPC_PROTOBUF_PROTOC_EXECUTABLE ${GRPC_HELPER__PROTOC_BIN})
-endif()
+# if (ANDROID)
+#     if (NOT CUSTOM_PROTOC)
+#         set(GRPC_HELPER__PROTOC_BIN "${CMAKE_BINARY_DIR}/protoc${CMAKE_EXECUTABLE_SUFFIX}")
+#     else()
+#         set(GRPC_HELPER__PROTOC_BIN "${CUSTOM_PROTOC}")
+#     endif()
+#
+#     if (NOT CUSTOM_GRPC_CPP_PLUGIN)
+#         set(GRPC_HELPER__CPP_PLUGIN "${CMAKE_BINARY_DIR}/grpc_cpp_plugin${CMAKE_EXECUTABLE_SUFFIX}")
+#     else()
+#         set(GRPC_HELPER__CPP_PLUGIN "${CUSTOM_GRPC_CPP_PLUGIN}")
+#     endif()
+#
+#     set(_gRPC_PROTOBUF_PROTOC_EXECUTABLE ${GRPC_HELPER__PROTOC_BIN})
+# endif()
 
 if (MSVC)
     # Build with multiple processes
@@ -123,24 +116,23 @@ if (ANDROID)
     target_compile_options(des_decrepit PRIVATE "-Wno-implicit-fallthrough")
 endif()
 
-if (NOT ANDROID)
-    if (CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-        set(GRPC_HELPER__PROTOC_BIN "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/protoc${CMAKE_EXECUTABLE_SUFFIX}")
-        set(GRPC_HELPER__CPP_PLUGIN "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/grpc_cpp_plugin${CMAKE_EXECUTABLE_SUFFIX}")
-    else()
-        set_target_properties(protoc PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tools")
-        set_target_properties(grpc_cpp_plugin PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tools")
-
-        set(GRPC_HELPER__PROTOC_BIN "${CMAKE_BINARY_DIR}/tools/${CMAKE_CFG_INTDIR}/protoc${CMAKE_EXECUTABLE_SUFFIX}")
-        set(GRPC_HELPER__CPP_PLUGIN "${CMAKE_BINARY_DIR}/tools/${CMAKE_CFG_INTDIR}/grpc_cpp_plugin${CMAKE_EXECUTABLE_SUFFIX}")
-    endif()
-endif()
-
-message(STATUS "Protobuf compiler      : ${GRPC_HELPER__PROTOC_BIN}")
-message(STATUS "gRPC source dir        : ${GRPC_HELPER__GRPC_SOURCE_DIR}")
-message(STATUS "gRPC C++ plugin        : ${GRPC_HELPER__CPP_PLUGIN}")
-message(STATUS "gRPC codegen script    : ${GRPC_HELPER__GRPC_CODEGEN}")
-message(STATUS "Protobuf codegen script: ${GRPC_HELPER__PROTOBUF_CODEGEN}")
-
-portable_target(LIBRARY ${PROJECT_NAME} INTERFACE ALIAS pfs::grpc_helper)
-portable_target(INCLUDE_DIRS ${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+# if (NOT ANDROID)
+#     if (NOT CUSTOM_PROTOC)
+#         add_dependencies(${PROJECT_NAME} protoc grpc_cpp_plugin)
+#     endif()
+#
+#     if (CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+#         set(GRPC_HELPER__PROTOC_BIN "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/protoc${CMAKE_EXECUTABLE_SUFFIX}")
+#         set(GRPC_HELPER__CPP_PLUGIN "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/grpc_cpp_plugin${CMAKE_EXECUTABLE_SUFFIX}")
+#     else()
+#         set_target_properties(protoc PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tools")
+#         set_target_properties(grpc_cpp_plugin PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tools")
+#
+#         set(GRPC_HELPER__PROTOC_BIN "${CMAKE_BINARY_DIR}/tools/${CMAKE_CFG_INTDIR}/protoc${CMAKE_EXECUTABLE_SUFFIX}")
+#         set(GRPC_HELPER__CPP_PLUGIN "${CMAKE_BINARY_DIR}/tools/${CMAKE_CFG_INTDIR}/grpc_cpp_plugin${CMAKE_EXECUTABLE_SUFFIX}")
+#     endif()
+# endif()
+#
+# message(STATUS "Protobuf compiler      : ${GRPC_HELPER__PROTOC_BIN}")
+# message(STATUS "gRPC source dir        : ${GRPC_HELPER__GRPC_SOURCE_DIR}")
+# message(STATUS "gRPC C++ plugin        : ${GRPC_HELPER__CPP_PLUGIN}")
