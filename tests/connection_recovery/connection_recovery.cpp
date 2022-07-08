@@ -8,8 +8,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "pfs/grpc/async_client.hpp"
 #include "pfs/grpc/async_server.hpp"
-#include "connection_recovery/connection_recovery.pb.h"
-#include "connection_recovery/connection_recovery.grpc.pb.h"
+#include "connection_recovery.pb.h"
+#include "connection_recovery.grpc.pb.h"
 #include <mutex>
 #include <condition_variable>
 #include <thread>

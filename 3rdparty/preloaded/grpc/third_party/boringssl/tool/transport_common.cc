@@ -111,12 +111,7 @@ bool Connect(int *out_sock, const std::string &hostname_and_port) {
 
   int ret = getaddrinfo(hostname.c_str(), port.c_str(), &hint, &result);
   if (ret != 0) {
-// --wladt--
-#if defined(_WIN32) || defined(_WIN64)
-    fprintf(stderr, "getaddrinfo returned: %ws\n", gai_strerror(ret));
-#else
     fprintf(stderr, "getaddrinfo returned: %s\n", gai_strerror(ret));
-#endif
     return false;
   }
 

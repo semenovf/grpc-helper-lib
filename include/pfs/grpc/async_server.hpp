@@ -511,8 +511,9 @@ public:
                 static_cast<basic_async_method<ServiceClass> *>(tag)->process_request(ok);
             else if (status == ::grpc::CompletionQueue::SHUTDOWN)
                 break;
-            else if (status == ::grpc::CompletionQueue::TIMEOUT)
-                ;
+            else if (status == ::grpc::CompletionQueue::TIMEOUT) {
+            }
+                
 
             if (finish())
                 shutdown();

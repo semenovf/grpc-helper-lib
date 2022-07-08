@@ -10,8 +10,8 @@
 #include "../doctest.h"
 #include "pfs/grpc/async_client.hpp"
 #include "pfs/grpc/async_server.hpp"
-#include "async/async.pb.h"
-#include "async/async.grpc.pb.h"
+#include "async.pb.h"
+#include "async.grpc.pb.h"
 #include <map>
 #include <thread>
 

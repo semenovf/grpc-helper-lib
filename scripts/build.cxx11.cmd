@@ -1,0 +1,7 @@
+set CMAKE_OPTIONS=
+set PROJECT_OPT_PREFIX=GRPC_HELPER__
+set CXX_STANDARD=11
+set BUILD_TESTS=ON
+set BUILD_DEMO=ON
+
+call ../build-windows.cmd

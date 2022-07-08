@@ -19,7 +19,7 @@
 #
 ################################################################################
 cmake_minimum_required (VERSION 3.11)
-project(grpc-helper-lib C CXX)
+project(grpc-helper C CXX)
 
 option(GRPC_HELPER__FORCE_PRELOADED_GRPC "Force process preloaded version of gRPC" OFF)
 
