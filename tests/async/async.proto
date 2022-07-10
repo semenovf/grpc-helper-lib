@@ -15,6 +15,7 @@ service TestService {
     // in Windows (valid for MSVC 2015 at least)
     rpc Start(StartServiceRequest) returns (ServiceStatus) {}
     rpc Stop(StopService) returns (ServiceStatus) {}
+    rpc Finish(FinishService) returns (FinishStatus) {}
 
     // Server-side streaming RPC
     rpc ListModules(GetListModules) returns (stream ModuleStatus) {}
@@ -40,11 +41,12 @@ enum ModuleStatusEnum {
     MODULE_DEACTIVATED = 1;
 }
 
-message StartServiceRequest {
-}
+message FinishService {}
+message FinishStatus {}
 
-message StopService {
-}
+message StartServiceRequest {}
+
+message StopService {}
 
 message ServiceStatus {
     ServiceStatusEnum status = 2;

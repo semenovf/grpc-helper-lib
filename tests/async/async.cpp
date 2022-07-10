@@ -12,10 +12,12 @@
 #include "pfs/grpc/async_server.hpp"
 #include "async.pb.h"
 #include "async.grpc.pb.h"
+#include <atomic>
 #include <map>
 #include <thread>
 
 static std::string const SERVER_ADDR = "localhost:1521";
+static std::atomic_bool FINISH {false};
 
 struct Module {
     std::string name;
@@ -235,6 +237,27 @@ public:
                   & TestRpc::TestService::AsyncService::RequestStartModules
                 , method_type::request_handler(f));
     }
+
+
+    void register_Finish ()
+    {
+        using request_type = TestRpc::FinishService;
+        using response_type = TestRpc::FinishStatus;
+        using method_type = pfs::grpc::async_unary_method<
+                  service_class
+                , request_type
+                , response_type>;
+
+        auto f = [this] (request_type const &, response_type * /*response*/) {
+            std::cout << "server: FinishService request\n";
+//             _service.status = TestRpc::TEST_SERVICE_STOPPED;
+//             response->set_status(_service.status);
+        };
+
+        register_method<request_type, response_type>(
+                  & TestRpc::TestService::AsyncService::RequestFinish
+                , method_type::request_handler(f));
+    }
 };
 
 // package TestRpc_______________________________________________
@@ -265,7 +288,7 @@ public:
         // Name 'PrepareAsyncCallStart' generates using concatenation of static
         // string 'PrepareAsync' and rpc name from .proto file ('CallStart').
         // This rule is valid for 'Simple RPC'
-#if _WIN32
+#if _MSC_VER
         return this->call<TestRpc::StartServiceRequest, TestRpc::ServiceStatus>(TestRpc::StartServiceRequest{}
             , &TestRpc::TestService::Stub::PrepareAsyncStart
             , pfs::grpc::async_unary<TestRpc::ServiceStatus>::response_handler(f));
@@ -287,7 +310,7 @@ public:
         };
 
         // Same as for 'call_start'
-#if _WIN32
+#if _MSC_VER
         return this->call<TestRpc::StopService, TestRpc::ServiceStatus>(TestRpc::StopService{}
             , &TestRpc::TestService::Stub::PrepareAsyncStop
             , pfs::grpc::async_unary<TestRpc::ServiceStatus>::response_handler(f));
@@ -313,7 +336,7 @@ public:
             }
         };
 
-#if _WIN32
+#if _MSC_VER
         return this->call<TestRpc::GetListModules, response_type>(TestRpc::GetListModules{}
             , &TestRpc::TestService::Stub::PrepareAsyncListModules
             , pfs::grpc::async_server_streaming<response_type>::response_handler(f));
@@ -349,7 +372,7 @@ public:
                     << "\tcomplete: " << std::boolalpha << response.complete() << "\n";
         };
 
-#if _WIN32
+#if _MSC_VER
         return this->call<request_type, response_type>(std::move(requests)
             , &TestRpc::TestService::Stub::PrepareAsyncSendSegments
             , pfs::grpc::async_client_streaming<request_type, response_type>::response_handler(f));
@@ -366,12 +389,14 @@ public:
         using request_type = TestRpc::StartModule;
         using response_type = TestRpc::ModuleStatus;
 
-        auto f = [] (std::list<response_type> const & responses) {
+        auto f = [this] (std::list<response_type> const & responses) {
             for (auto const & response: responses) {
                 std::cout << "Module:\n"
                         << "\tname  : " << response.name() << "\n"
                         << "\tstatus: " << to_string(response.status()) << "\n";
             }
+
+            call_Finish();
         };
 
         request_type rq1;
@@ -386,11 +411,23 @@ public:
                 , & TestRpc::TestService::Stub::PrepareAsyncStartModules
                 , pfs::grpc::async_bidi_streaming<request_type, response_type>::response_handler(f));
     }
+
+    bool call_Finish ()
+    {
+        auto f = [] (TestRpc::FinishStatus const &) {
+            std::cout << "Finalization...\n";
+            FINISH.store(true);
+        };
+
+        return this->call<TestRpc::FinishService, TestRpc::FinishStatus>(TestRpc::FinishService{}
+            , & TestRpc::TestService::Stub::PrepareAsyncFinish
+            , pfs::grpc::async_unary<TestRpc::FinishStatus>::response_handler(f));
+    }
 };
 
 TEST_CASE("Asynchronous RPC") {
     concrete_async_server server(SERVER_ADDR);
-    std::thread server_thread { [& server] { server.run(); }};
+    std::thread server_thread { [& server] { server.run([] { return FINISH.load(); }); }};
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -401,8 +438,9 @@ TEST_CASE("Asynchronous RPC") {
     server.register_ListModules();
     server.register_SendSegments();
     server.register_StartModules();
+    server.register_Finish();
 
-    std::thread client_reader { [& client] { client.process(); }};
+    std::thread client_reader { [& client] { client.process([] { return FINISH.load(); }); }};
 
     client.call_Start();
     client.call_Stop();
