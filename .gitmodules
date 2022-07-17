@@ -1,6 +1,7 @@
 [submodule "3rdparty/grpc"]
 	path = 3rdparty/grpc
 	url = https://github.com/grpc/grpc.git
+	branch = v1.46.3
 [submodule "3rdparty/portable-target"]
 	path = 3rdparty/portable-target
 	url = git@github.com:semenovf/portable-target.git

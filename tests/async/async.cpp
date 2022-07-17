@@ -449,6 +449,6 @@ TEST_CASE("Asynchronous RPC") {
     client.call_SendSegments();
     client.call_StartModules();
 
-    server_thread.join();
     client_reader.join();
+    server_thread.join();
 }

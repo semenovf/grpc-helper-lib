@@ -514,7 +514,6 @@ public:
             else if (status == ::grpc::CompletionQueue::TIMEOUT) {
             }
                 
-
             if (finish())
                 shutdown();
         }
