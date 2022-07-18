@@ -376,8 +376,8 @@ add_subdirectory(third_party/fiat)
 add_subdirectory(ssl)
 #--wladt--
 # add_subdirectory(ssl/test)
-add_subdirectory(fipstools)
-add_subdirectory(tool)
+#add_subdirectory(fipstools)
+#add_subdirectory(tool)
 add_subdirectory(decrepit)
 
 if(FUZZ)

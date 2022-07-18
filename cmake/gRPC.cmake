@@ -10,6 +10,7 @@ cmake_minimum_required(VERSION 3.11)
 
 set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "Use CMake C++ standard meta features (e.g. cxx_std_11) that propagate to targets that link to Abseil")
 set(gRPC_BUILD_TESTS OFF CACHE BOOL "Build tests")
+set(CARES_BUILD_TOOLS OFF CACHE BOOL "C-ares build tools")
 
 # Workaround for GCC 4.7.2
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
