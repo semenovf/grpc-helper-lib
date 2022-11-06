@@ -488,7 +488,7 @@ static long conn_callback_ctrl(BIO *bio, int cmd, bio_info_cb fp) {
 
   switch (cmd) {
     case BIO_CTRL_SET_CALLBACK:
-      data->info_callback = (int (*)(const struct bio_st *, int, int))fp;
+      data->info_callback = (int (*)(const struct bio_st *, int, int))((void*)fp);
       break;
     default:
       ret = 0;
