@@ -34,21 +34,17 @@ else()
     set(GRPC_HELPER__GRPC_BINARY_SUBDIR "3rdparty/preloaded/grpc")
 endif()
 
-# if (ANDROID)
-#     if (NOT CUSTOM_PROTOC)
-#         set(GRPC_HELPER__PROTOC_BIN "${CMAKE_BINARY_DIR}/protoc${CMAKE_EXECUTABLE_SUFFIX}")
-#     else()
-#         set(GRPC_HELPER__PROTOC_BIN "${CUSTOM_PROTOC}")
-#     endif()
-#
-#     if (NOT CUSTOM_GRPC_CPP_PLUGIN)
-#         set(GRPC_HELPER__CPP_PLUGIN "${CMAKE_BINARY_DIR}/grpc_cpp_plugin${CMAKE_EXECUTABLE_SUFFIX}")
-#     else()
-#         set(GRPC_HELPER__CPP_PLUGIN "${CUSTOM_GRPC_CPP_PLUGIN}")
-#     endif()
-#
-#     set(_gRPC_PROTOBUF_PROTOC_EXECUTABLE ${GRPC_HELPER__PROTOC_BIN})
-# endif()
+if (ANDROID)
+    portable_target(GET PROTOC_BIN _gRPC_PROTOBUF_PROTOC_EXECUTABLE)
+
+    if (NOT _gRPC_PROTOBUF_PROTOC_EXECUTABLE)
+        message(FATAL_ERROR "`protoc` path must be specified")
+    endif()
+
+    if (NOT EXISTS ${_gRPC_PROTOBUF_PROTOC_EXECUTABLE})
+        message(FATAL_ERROR "Invalid localetion for `protoc`: ${_gRPC_PROTOBUF_PROTOC_EXECUTABLE}")
+    endif()
+endif()
 
 if (MSVC)
     # Build with multiple processes

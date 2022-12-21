@@ -5,7 +5,7 @@
 #
 # Changelog:
 #      2022.06.15 Initial version (inspired from `pfs-grpc`).
-#      2022.07.17 Moved gRPC build instructions into separate file: 
+#      2022.07.17 Moved gRPC build instructions into separate file:
 #                 cmake/gRPC.cmake.
 ################################################################################
 ################################################################################
@@ -17,7 +17,7 @@
 ################################################################################
 #
 # This sctipt choose appropriate version of gRPC: preloaded (with modifications
-# to use with GCCC 4.7.2) or loaded as submodule
+# to use with GCC 4.7.2) or loaded as submodule
 #
 ################################################################################
 cmake_minimum_required (VERSION 3.11)
