@@ -36,13 +36,22 @@ endif()
 
 if (ANDROID)
     portable_target(GET PROTOC_BIN _gRPC_PROTOBUF_PROTOC_EXECUTABLE)
+    portable_target(GET GRPC_CPP_PLUGIN _gRPC_CPP_PLUGIN)
 
     if (NOT _gRPC_PROTOBUF_PROTOC_EXECUTABLE)
         message(FATAL_ERROR "`protoc` path must be specified")
     endif()
 
+    if (NOT _gRPC_CPP_PLUGIN)
+        message(FATAL_ERROR "`grpc_cpp_plugin` path must be specified")
+    endif()
+
     if (NOT EXISTS ${_gRPC_PROTOBUF_PROTOC_EXECUTABLE})
-        message(FATAL_ERROR "Invalid localetion for `protoc`: ${_gRPC_PROTOBUF_PROTOC_EXECUTABLE}")
+        message(FATAL_ERROR "Invalid location for `protoc`: ${_gRPC_PROTOBUF_PROTOC_EXECUTABLE}")
+    endif()
+
+    if (NOT EXISTS ${_gRPC_CPP_PLUGIN})
+        message(FATAL_ERROR "Invalid location for `grpc_cpp_plugin`: ${_gRPC_CPP_PLUGIN}")
     endif()
 endif()
 
